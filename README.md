@@ -76,7 +76,7 @@ Counts for genes in cell type two are drawn from the same distribution as their 
 
 The gene set list returned is based on cell type one, as above if their is DE the last gene sets listed will contain the DE genes.
 
-The proportion of normal cells is given in the colData of the SummarizedExperiment objectas purity.
+The proportion of normal cells is given in the colData of the SummarizedExperiment object as purity.
 
 
 #### Cancer_WO_MREMA
