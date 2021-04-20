@@ -31,13 +31,13 @@ source("globalfunctions.R")
 ```R
 simulation_1 <- simulation(s=100 , p=10, N=20, beta=0.02 ,gamma=.8 , foldchange=3 , upreg=.5)
 ```
-s - number of gene sets.
-p - number of genes in each set.
-N - number of samples.
-beta - proportion of gene sets in data set that have DE genes.
-gamma - proportion of DE genes in a gene set with DE genes.
-foldchange - foldchange of DE genes.
-upreg - proportion of DE genes that are upregulated.
+s - number of gene sets.  
+p - number of genes in each set.  
+N - number of samples.  
+beta - proportion of gene sets in data set that have DE genes.  
+gamma - proportion of DE genes in a gene set with DE genes.  
+foldchange - foldchange of DE genes.  
+upreg - proportion of DE genes that are upregulated.  
 
 `simulation_1$sum_exp_raw_count` - SummarizedExperiment object.
 
@@ -55,6 +55,7 @@ w_o_mrema(simulation_1$sum_exp_raw_count, simulation_1$raw.gs)
 
 The p-value is given for the likelihood-ratio test. This should be corrected for multiple testing and is conditional on the mid_dist being TRUE. mid_dist tests whether the weight assigned to the non-DE genes in a gene set is smaller in the gene set than in the genes outside the gene set.
 The size of the gene set is also given.
+
 Finally it is tested whether the Bayesian information criterion (BIC) of the gene is lower than the BIC for all.
 
 
@@ -70,7 +71,9 @@ prop = rbeta(20,1,1)
 simulation_cancer <- simulation_2Cell_types(s=100 , p=10, N=20, beta=0.02 ,gamma=.8 , foldchange=3 , upreg=.5, prop_norm = prop)
 ```
 Same parameter as above for DE in cell type one. The proportions for cell type two (with no DE genes or sets) are given as an arguement.
+
 Counts for genes in cell type two are drawn from the same distribution as their corresponding gene in cell type one controls, but no DE is seen in cases.
+
 The gene set list returned is based on cell type one, as above if their is DE the last gene sets listed will contain the DE genes.
 
 #### Cancer_WO_MREMA
