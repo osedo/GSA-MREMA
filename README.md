@@ -4,8 +4,10 @@
 1. **packages.R**- Loads the required packages.
 2. **functions.R** - Defines functions used for the EM algorithm.
 3. **globalfunctions.R** - Functions for Gene Set Anlysis and csGSA.
-4. **Luminal_Sum_Exp_KEGG.Rdata** - SummarizedExperiment object - Luminal A and Luminal B breast cancer samples.
-5. **BR_KEGG.Rdata** - Gene set list - KEGG subset of canonical pathways.
+4. **sumexp_sets.R** - Downloads and orders count data from TCGA and Gene sets from MSigDB. Returns gene set and summarizedExperiment object.
+5. **Combined_Purity_Estimates.txt** - Purity Estimates - Data not all available for cancer types.
+6. **Luminal_Sum_Exp_KEGG.Rdata** - SummarizedExperiment object - Luminal A and Luminal B breast cancer samples.
+7. **BR_KEGG.Rdata** - Gene set list - KEGG subset of canonical pathways.
 
 &nbsp;
 
