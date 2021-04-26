@@ -23,32 +23,43 @@ source("globalfunctions.R")
 &nbsp;
 &nbsp;
 
-### MREMA-GSA
-
-
-#### Simulate data
+### Data Sets
 
 ```R
-simulation_1 <- simulation(s=100 , p=10, N=20, beta=0.02 ,gamma=.8 , foldchange=3 , upreg=.5)
+load("BR_KEGG.Rdata")
+load("Luminal_Sum_Exp_KEGG.Rdata")
 ```
-s - number of gene sets.  
-p - number of genes in each set.  
-N - number of samples.  
-beta - proportion of gene sets in data set that have DE genes.  
-gamma - proportion of DE genes in a gene set with DE genes.  
-foldchange - foldchange of DE genes.  
-upreg - proportion of DE genes that are upregulated.  
 
-`simulation_1$sum_exp_raw_count` - SummarizedExperiment object.
+The data consists of a SummarizedExperiment object which has the raw count data for TCGA breast cancer samples. Luminal A tumours are classed as group 0 and luminal B tumours are classed as group 1. The purity given is the proportion of normal cells in a sample.  
+The gene sets given are from the KEGG subset of the canonical pathways, taken from the MSigDB Collections.  
+Only genes that overlapped between sets were kept for analysis.  
 
-`simulation_1$raw.gs` - List of gene sets. If gene sets in DE they will be last gene sets in the list. In this example gene sets 99 and 100.
+```R
+sum_exp_raw_count
+```
+
+
 
 &nbsp;
 
-#### RUN MREMA-GSA
+### Normalize Data
+We follow DESeq2 workflow to normalize data, this is optional users can use and other packages. It should be noted that users could also use microarray data.
 
 ```R
-w_o_mrema(simulation_1$sum_exp_raw_count, simulation_1$raw.gs)
+dea_raw_count<- DESeqDataSetFromMatrix(countData = assay(sum_exp_raw_count), colData = colData(sum_exp_raw_count), design = ~ GROUP)
+# now we estimate the size factors
+dea_raw_count<- estimateSizeFactors(dea_raw_count)
+# Extract the normalized counts, this matrix must then go to the gsa
+sum_exp_normalized_counts<- counts(dea_raw_count, normalized=TRUE)
+sum_exp_normalized_counts<- log2(sum_exp_normalized_counts+0.5)
+# create new data frame with normalized counts.
+sum_exp_normalized_object <- SummarizedExperiment(assays=SimpleList(counts=sum_exp_normalized_counts), colData=colData(sum_exp_raw_count), rowData=DataFrame(rownames(sum_exp_normalized_counts)))
+```
+
+### RUN GSA
+
+```R
+w_o_mrema(sum_exp_normalized_object, gene_sets)
 ```
 
 `mrema()` and `wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively. 
@@ -63,34 +74,22 @@ Finally it is tested whether the Bayesian information criterion (BIC) of the gen
 
 &nbsp;
 
-### csGSA (cell type specific GSA)
+### Run csGSA (cell type specific GSA)
 
-#### Simulate data
+Gene sets enriched in luminal B cancer cells when compared to luminal A cancer cells.
+
 ```R
-prop = rbeta(20,1,1)
-simulation_cancer <- simulation_2Cell_types(s=100 , p=10, N=20, beta=0.02 ,gamma=.8 , foldchange=3 , upreg=.5, prop_norm = prop)
+cancer_w_o_mrema(sum_exp_normalized_object, gene_sets)
 ```
-Same parameter as above for DE in cell type one. The proportions for cell type two (with no DE genes or sets) are given as an arguement.
-
-Counts for genes in cell type two are drawn from the same distribution as their corresponding gene in cell type one controls, but no DE is seen in cases.
-
-The gene set list returned is based on cell type one, as above if their is DE the last gene sets listed will contain the DE genes.
-
-The proportion of normal cells is given in the colData of the SummarizedExperiment object as purity.
-
-
-#### Cancer_WO_MREMA
-```R
-cancer_w_o_mrema(simulation_cancer$sum_exp_raw_count, simulation_cancer$raw.gs)
-```
+`cancer_mrema()` and `cancer_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
 &nbsp;
 
-Compare with genes sets found to be enriched in normal cells.
+Genes sets found to be enriched in normal cells in luminal B tumour when compared to normal cells in luminal A tumours.
 
 ```R
 normal_w_o_mrema(simulation_cancer$sum_exp_raw_count, simulation_cancer$raw.gs)
 ```
-
+`normal_mrema()` and `normal_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
 
 
 
