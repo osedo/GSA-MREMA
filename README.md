@@ -1,10 +1,10 @@
 # GSA-MREMA
 
 ### Scripts
-1. **packages.R**- Loads the required packages. BiocManager version 3.12 needed.
-2. **functions.R** - Defines functions used for the EM algorithm and for simulating data.
-3. **simulateddata.R** - Functions for the simulation of a SummarizedExperiment object - one or two cell types simulations possible.
-4. **globalfunctions.R** - Functions for Gene Set Anlysis and csGSA. 
+1. **packages.R**- Loads the required packages.
+2. **functions.R** - Defines functions used for the EM algorithm.
+3. **globalfunctions.R** - Functions for Gene Set Anlysis and csGSA.
+4.  
 
 &nbsp;
 
