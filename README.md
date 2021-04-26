@@ -26,8 +26,8 @@ source("globalfunctions.R")
 ### Data Sets
 
 ```R
-load("BR_KEGG.Rdata")
-load("Luminal_Sum_Exp_KEGG.Rdata")
+load("BR_KEGG.Rdata") # gene_sets
+load("Luminal_Sum_Exp_KEGG.Rdata") # sum_exp_raw_count
 ```
 
 The data consists of a SummarizedExperiment object which has the raw count data for TCGA breast cancer samples. Luminal A tumours are classed as group 0 and luminal B tumours are classed as group 1. The purity given is the proportion of normal cells in a sample.  
@@ -43,7 +43,7 @@ sum_exp_raw_count
 &nbsp;
 
 ### Normalize Data
-We follow DESeq2 workflow to normalize data, this is optional users can use and other packages. It should be noted that users could also use microarray data.
+We follow DESeq2 workflow to normalize data, this is optional users can use other packages. It should be noted that users could also use microarray data.
 
 ```R
 dea_raw_count<- DESeqDataSetFromMatrix(countData = assay(sum_exp_raw_count), colData = colData(sum_exp_raw_count), design = ~ GROUP)
@@ -89,6 +89,7 @@ Genes sets found to be enriched in normal cells in luminal B tumour when compare
 ```R
 normal_w_o_mrema(simulation_cancer$sum_exp_raw_count, simulation_cancer$raw.gs)
 ```
+
 `normal_mrema()` and `normal_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
 
 
