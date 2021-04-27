@@ -2,6 +2,8 @@
 
 library(TCGAbiolinks)
 library(msigdbr)
+library(dplyr)
+library(SummarizedExperiment)
 
 # download tumour subtype data 
 # https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations
