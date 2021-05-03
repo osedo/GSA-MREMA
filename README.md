@@ -75,13 +75,10 @@ The size of the gene set is also given.
 Finally it is tested whether the Bayesian information criterion (BIC) of the gene is lower than the BIC for all.
 
 
-&nbsp;
-
-&nbsp;
 
 ### 4. b) csGSA (cell type specific GSA)
 
-Gene sets enriched in luminal B cancer cells when compared to luminal A cancer cells.
+Gene sets enriched differentially expressed genes in luminal B cancer cells when compared to luminal A cancer cells.
 
 ```R
 cancer_w_o_mrema(sum_exp_normalized_object, gene_sets)
@@ -89,7 +86,7 @@ cancer_w_o_mrema(sum_exp_normalized_object, gene_sets)
 `cancer_mrema()` and `cancer_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
 &nbsp;
 
-Genes sets found to be enriched in normal cells in luminal B tumour when compared to normal cells in luminal A tumours.
+Genes sets found to be enriched in normal cells in luminal B tumours when compared to normal cells in luminal A tumours.
 
 ```R
 normal_w_o_mrema(simulation_cancer$sum_exp_raw_count, simulation_cancer$raw.gs)
