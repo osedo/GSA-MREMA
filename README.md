@@ -1,20 +1,13 @@
-# GSA-MREMA
-
-### Files
-1. **packages.R**- Loads the required packages.
-2. **functions.R** - Defines functions used for the EM algorithm.
-3. **globalfunctions.R** - Functions for Gene Set Anlysis and csGSA.
-4. **sumexp_sets.R** - Downloads and orders count data from TCGA and Gene sets from MSigDB. Returns gene set and summarizedExperiment object.
-5. **Combined_Purity_Estimates.txt** - Purity Estimates - Data not all available for cancer types.
-6. **Luminal_Sum_Exp_KEGG.Rdata** - SummarizedExperiment object - Luminal A and Luminal B breast cancer samples.
-7. **BR_KEGG.Rdata** - Gene set list - KEGG subset of canonical pathways.
-
+## Gene set analysis & cell-type specific gene set analysis
 &nbsp;
+### 1. Required
+1. A SummarizedExperiment object with count data and group and purity information for each sample.
+2. A list of gene sets.
+3. The functons and packages found in the scripts above. 
 
-&nbsp;
 
 
-### Load Packages & Functions 
+### 2. Load Packages, Functions & Data
 ```R 
 source("packages.R")
 source("functions.R")
@@ -22,11 +15,7 @@ source("simulateddata.R")
 source("globalfunctions.R")
 ```
 
-
 &nbsp;
-&nbsp;
-
-### Data Sets
 
 ```R
 load("BR_KEGG.Rdata") # gene_sets
@@ -35,18 +24,29 @@ load("Luminal_Sum_Exp_KEGG.Rdata") # sum_exp_raw_count
 
 The data consists of a SummarizedExperiment object which has the raw count data for TCGA breast cancer samples. Luminal A tumours are classed as group 0 and luminal B tumours are classed as group 1. The purity given is the proportion of normal cells in a sample.  
 The gene sets given are from the KEGG subset of the canonical pathways, taken from the MSigDB Collections.  
-Only genes that overlapped between sets were kept for analysis.  
+Only genes that were in these gene sets were kept in the count data. 
 
 ```R
 sum_exp_raw_count
 ```
+```R
+class: SummarizedExperiment 
+dim: 5102 760 
+metadata(0):
+assays(1): counts
+rownames(5102): DPM1 FGR ... OR12D2 OR8K3
+rowData names(1): rownames.combined_counts.
+colnames(760): TCGA-E9-A245 TCGA-AC-A6NO ... TCGA-BH-A0BD TCGA-AN-A0AM
+colData names(2): GROUP purity
+```
+Note that purity corresponds to the proportion of normal cells in a sample.
 
 
 
 &nbsp;
 
-### Normalize Data
-We follow DESeq2 workflow to normalize data, this is optional users can use other packages. It should be noted that users could also use microarray data.
+### 3. Normalize Data (Optional)
+We follow DESeq2 workflow to normalize data, this is optional and users can use other packages/workflows. It should be noted that users could also use microarray data.
 
 ```R
 dea_raw_count<- DESeqDataSetFromMatrix(countData = assay(sum_exp_raw_count), colData = colData(sum_exp_raw_count), design = ~ GROUP)
@@ -58,9 +58,11 @@ sum_exp_normalized_counts<- log2(sum_exp_normalized_counts+0.5)
 # create new data frame with normalized counts.
 sum_exp_normalized_object <- SummarizedExperiment(assays=SimpleList(counts=sum_exp_normalized_counts), colData=colData(sum_exp_raw_count), rowData=DataFrame(rownames(sum_exp_normalized_counts)))
 ```
+We have created a new SummarizedExperiment object with normalized counts instead of raw counts.
 
-### RUN GSA
+### 4. a) GSA
 
+A standard GSA can be run to find gene sets enriched for differentially expressed genes between luminal A and luminal B subtypes of breast cancer. 
 ```R
 w_o_mrema(sum_exp_normalized_object, gene_sets)
 ```
@@ -77,7 +79,7 @@ Finally it is tested whether the Bayesian information criterion (BIC) of the gen
 
 &nbsp;
 
-### Run csGSA (cell type specific GSA)
+### 4. b) csGSA (cell type specific GSA)
 
 Gene sets enriched in luminal B cancer cells when compared to luminal A cancer cells.
 
