@@ -3,7 +3,7 @@
 ### 1. Required
 1. A SummarizedExperiment object with count data and group and purity information for each sample.
 2. A list of gene sets.
-3. The functons and packages found in the scripts above. 
+3. The functions and packages found in the scripts above. 
 
 
 
