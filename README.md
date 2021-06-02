@@ -41,7 +41,7 @@ $KEGG_ABC_TRANSPORTERS
 
 &nbsp;
 
-### 3. Normalize Data (Optional)
+### Preprocessing
 We follow DESeq2 workflow to normalize data, this is optional and users can use other packages/workflows. It should be noted that users could also use microarray data.
 
 ```R
@@ -56,7 +56,7 @@ sum_exp_normalized_object <- SummarizedExperiment(assays=SimpleList(counts=sum_e
 ```
 We have created a new SummarizedExperiment object with normalized counts instead of raw counts.
 
-### 4. a) GSA
+### GSA
 
 A standard GSA can be run to find gene sets enriched for differentially expressed genes between luminal A and luminal B subtypes of breast cancer. 
 ```R
@@ -72,7 +72,7 @@ Finally it is tested whether the Bayesian information criterion (BIC) of the gen
 
 
 
-### 4. b) csGSA (cell type specific GSA)
+### csGSA (cell type specific GSA)
 
 Gene sets enriched differentially expressed genes in luminal B cancer cells when compared to luminal A cancer cells.
 
