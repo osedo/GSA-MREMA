@@ -3,26 +3,11 @@
 
 A novel approach to GSA based on random effect meta-analysis, which compares the distribution of the effect of a sample group on genes in a gene set with the distribution found in genes outside the gene set. Extending this approach to the cell-type specific GSA problem allows the identification of gene sets for which the group effect differs between cell types in the samples. 
 
-
-
-### 2. Load Packages, Functions & Data
-```R 
-source("packages.R")
-source("functions.R")
-source("simulateddata.R")
-source("globalfunctions.R")
-```
-
 &nbsp;
 
-```R
-load("BR_KEGG.Rdata") # gene_sets
-load("Luminal_Sum_Exp_KEGG.Rdata") # sum_exp_raw_count
-```
+### Input 
 
-The data consists of a SummarizedExperiment object which has the raw count data for TCGA breast cancer samples. Luminal A tumours are classed as group 0 and luminal B tumours are classed as group 1. The purity given is the proportion of normal cells in a sample.  
-The gene sets given are from the KEGG subset of the canonical pathways, taken from the MSigDB Collections.  
-Only genes that were in these gene sets were kept in the count data. 
+A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. If you wish to continue with the cell-type specific problem the purity estimates should be added to the colData of the SummarizedExperiment object. In this context the values given for purity should be the proportion of normal cells in a sample.
 
 ```R
 sum_exp_raw_count
@@ -37,7 +22,20 @@ rowData names(1): rownames.combined_counts.
 colnames(760): TCGA-E9-A245 TCGA-AC-A6NO ... TCGA-BH-A0BD TCGA-AN-A0AM
 colData names(2): GROUP purity
 ```
-Note that purity corresponds to the proportion of normal cells in a sample.
+
+An R list of gene sets with each element corresponding to a gene set. The name of the element should correspond to the gene set while the element itself contains the constituent genes. 
+
+```R
+gene_sets[1]
+```
+
+```R
+$KEGG_ABC_TRANSPORTERS
+ [1] "ABCA1"  "ABCA10" "ABCA12" "ABCA13" "ABCA2"  "ABCA3"  "ABCA4"  "ABCA5"  "ABCA6"  "ABCA7"  "ABCA8"  "ABCA9"  "ABCB1"  "ABCB10" "ABCB11" "ABCB4"  "ABCB5"  "ABCB6"  "ABCB7"  "ABCB8"  "ABCB9" 
+[22] "ABCC1"  "ABCC10" "ABCC11" "ABCC12" "ABCC2"  "ABCC3"  "ABCC4"  "ABCC5"  "ABCC6"  "ABCC8"  "ABCC9"  "ABCD1"  "ABCD2"  "ABCD3"  "ABCD4"  "ABCG1"  "ABCG2"  "ABCG4"  "ABCG5"  "ABCG8"  "CFTR"  
+[43] "TAP1"   "TAP2"  
+```
+
 
 
 
