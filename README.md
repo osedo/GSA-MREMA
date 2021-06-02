@@ -1,9 +1,7 @@
 ## Gene set analysis & cell-type specific gene set analysis
 &nbsp;
-### 1. Required
-1. A SummarizedExperiment object with count data and group and purity information for each sample.
-2. A list of gene sets.
-3. The functions and packages found in the scripts above. 
+
+A novel approach to GSA based on random effect meta-analysis, which compares the distribution of the effect of a sample group on genes in a gene set with the distribution found in genes outside the gene set. Extending this approach to the cell-type specific GSA problem allows the identification of gene sets for which the group effect differs between cell types in the samples. 
 
 
 
