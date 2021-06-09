@@ -7,7 +7,7 @@ A novel approach to GSA based on random effect meta-analysis, which compares the
 
 ### Input 
 
-A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. If you wish to continue with the cell-type specific problem the purity estimates should be added to the colData of the SummarizedExperiment object. In this context the values given for purity should be the proportion of normal cells in a sample.
+A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. If you wish to continue with the cell-type specific problem the estimates of the cell propotion of interst should be added to the colData of the SummarizedExperiment object. In this example the proportion of cancer cells in a sample is supplied in the colData as purity.
 
 ```R
 sum_exp_raw_count
@@ -77,18 +77,12 @@ Finally it is tested whether the Bayesian information criterion (BIC) of the gen
 Gene sets enriched differentially expressed genes in luminal B cancer cells when compared to luminal A cancer cells.
 
 ```R
-cancer_w_o_mrema(sum_exp_normalized_object, gene_sets)
+cell_type_w_o_mrema(sum_exp_normalized_object, gene_sets)
 ```
-`cancer_mrema()` and `cancer_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
+`cell_type_mrema()` and `cell_type_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
 &nbsp;
 
-Genes sets found to be enriched in normal cells in luminal B tumours when compared to normal cells in luminal A tumours.
-
-```R
-normal_w_o_mrema(simulation_cancer$sum_exp_raw_count, simulation_cancer$raw.gs)
-```
-
-`normal_mrema()` and `normal_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
+Genes sets found to be enriched in normal cells in luminal B tumours when compared to normal cells in luminal A tumours can be found by changing the purity column values to (1 - purity) and running the cell-type specific functions.
 
 
 
