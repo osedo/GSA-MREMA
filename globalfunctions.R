@@ -15,7 +15,7 @@ mrema<- function(sum_exp_raw_count, raw.gs){
    n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   
   # the first step, which is fitting regression
@@ -263,7 +263,7 @@ w_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   reg1<- apply(sum_exp_normalized_counts,1, function(x) summary(lm(x~ gr))$coefficients)
   
@@ -508,7 +508,7 @@ wm_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   reg1<- apply(sum_exp_normalized_counts,1, function(x) summary(lm(x~ gr))$coefficients)
   
@@ -817,7 +817,7 @@ estimate_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   cr<-colData(sum_exp_raw_count)$purity
   
@@ -1138,7 +1138,7 @@ estimate_w_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   cr<-colData(sum_exp_raw_count)$purity
   
@@ -1385,7 +1385,7 @@ estimate_wm_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   cr<-colData(sum_exp_raw_count)$purity
   
@@ -1685,7 +1685,7 @@ cell_type_w_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   cr<-colData(sum_exp_raw_count)$purity
   cr<- 1-cr
@@ -1932,7 +1932,7 @@ cell_type_wm_o_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   cr<-colData(sum_exp_raw_count)$purity
   cr<- 1-cr
@@ -2221,7 +2221,7 @@ cell_type_mrema<- function(sum_exp_raw_count, raw.gs){
   n<- 1000
   m<- 1e-6
   iter<- 10
-  
+  sum_exp_normalized_counts <- assay(sum_exp_raw_count)
   gr<- colData(sum_exp_raw_count)$GROUP
   
   cr<-colData(sum_exp_raw_count)$purity
