@@ -1,39 +1,63 @@
-## Gene set analysis & cell-type specific gene set analysis
+## Mixture of Random-Effect Meta-Analysis Components
 &nbsp;
 
-A novel approach to GSA based on random effect meta-analysis, which compares the distribution of the effect of a sample group on genes in a gene set with the distribution found in genes outside the gene set. Extending this approach to the cell-type specific GSA problem allows the identification of gene sets for which the group effect differs between cell types in the samples. 
+A novel approach to GSA based on random effect meta-analysis, which compares the distribution of the effect of a sample group on genes in a gene set with the distribution found in genes outside the gene set.
 
 &nbsp;
 
 ### Input 
 
-A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. If you wish to continue with the cell-type specific problem the estimates of the cell propotion of interst should be added to the colData of the SummarizedExperiment object. In this example the proportion of cancer cells in a sample is supplied in the colData as purity.
+Read in packages, functions and data
+```R
+source("packages.R")
+source("GMM_7DF.R")
+load("COAD_SummarizedExperiment.RDs")
+```
+
+A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. 
 
 ```R
-sum_exp_raw_count
+COAD_SummarizedExperiment
 ```
 ```R
 class: SummarizedExperiment 
-dim: 5102 760 
+dim: 5230 501 
 metadata(0):
 assays(1): counts
-rownames(5102): DPM1 FGR ... OR12D2 OR8K3
-rowData names(1): rownames.combined_counts.
-colnames(760): TCGA-E9-A245 TCGA-AC-A6NO ... TCGA-BH-A0BD TCGA-AN-A0AM
-colData names(2): GROUP purity
+rownames(5230): ENSG00000000419 ENSG00000000938 ... ENSG00000280236 ENSG00000280314
+rowData names(0):
+colnames(501): TCGA-D5-6530-01A TCGA-G4-6320-01A ... TCGA-A6-5657-01A TCGA-AA-3688-01A
+colData names(5): GROUP Patient Age Sex menopause
 ```
 
-An R list of gene sets with each element corresponding to a gene set. The name of the element should correspond to the gene set while the element itself contains the constituent genes. 
+An R list of gene sets with each element corresponding to a gene set. 
 
 ```R
-gene_sets[1]
+gene_sets[c(1,2)]
 ```
 
 ```R
 $KEGG_ABC_TRANSPORTERS
- [1] "ABCA1"  "ABCA10" "ABCA12" "ABCA13" "ABCA2"  "ABCA3"  "ABCA4"  "ABCA5"  "ABCA6"  "ABCA7"  "ABCA8"  "ABCA9"  "ABCB1"  "ABCB10" "ABCB11" "ABCB4"  "ABCB5"  "ABCB6"  "ABCB7"  "ABCB8"  "ABCB9" 
-[22] "ABCC1"  "ABCC10" "ABCC11" "ABCC12" "ABCC2"  "ABCC3"  "ABCC4"  "ABCC5"  "ABCC6"  "ABCC8"  "ABCC9"  "ABCD1"  "ABCD2"  "ABCD3"  "ABCD4"  "ABCG1"  "ABCG2"  "ABCG4"  "ABCG5"  "ABCG8"  "CFTR"  
-[43] "TAP1"   "TAP2"  
+ [1] "ENSG00000165029" "ENSG00000154263" "ENSG00000144452" "ENSG00000179869" "ENSG00000107331" "ENSG00000167972"
+ [7] "ENSG00000198691" "ENSG00000154265" "ENSG00000154262" "ENSG00000064687" "ENSG00000141338" "ENSG00000154258"
+[13] "ENSG00000085563" "ENSG00000135776" "ENSG00000073734" "ENSG00000005471" "ENSG00000004846" "ENSG00000115657"
+[19] "ENSG00000131269" "ENSG00000197150" "ENSG00000150967" "ENSG00000103222" "ENSG00000124574" "ENSG00000121270"
+[25] "ENSG00000140798" "ENSG00000023839" "ENSG00000108846" "ENSG00000125257" "ENSG00000114770" "ENSG00000091262"
+[31] "ENSG00000006071" "ENSG00000069431" "ENSG00000101986" "ENSG00000173208" "ENSG00000117528" "ENSG00000119688"
+[37] "ENSG00000160179" "ENSG00000118777" "ENSG00000172350" "ENSG00000138075" "ENSG00000143921" "ENSG00000001626"
+[43] "ENSG00000168394" "ENSG00000204267"
+
+$KEGG_ACUTE_MYELOID_LEUKEMIA
+ [1] "ENSG00000142208" "ENSG00000105221" "ENSG00000117020" "ENSG00000078061" "ENSG00000002330" "ENSG00000157764"
+ [7] "ENSG00000133101" "ENSG00000110092" "ENSG00000245848" "ENSG00000213341" "ENSG00000187840" "ENSG00000122025"
+[13] "ENSG00000177885" "ENSG00000174775" "ENSG00000104365" "ENSG00000269335" "ENSG00000173801" "ENSG00000157404"
+[19] "ENSG00000133703" "ENSG00000138795" "ENSG00000169032" "ENSG00000126934" "ENSG00000100030" "ENSG00000102882"
+[25] "ENSG00000198793" "ENSG00000136997" "ENSG00000109320" "ENSG00000213281" "ENSG00000121879" "ENSG00000051382"
+[31] "ENSG00000171608" "ENSG00000105851" "ENSG00000145675" "ENSG00000105647" "ENSG00000117461" "ENSG00000141506"
+[37] "ENSG00000137193" "ENSG00000102096" "ENSG00000140464" "ENSG00000112033" "ENSG00000132155" "ENSG00000131759"
+[43] "ENSG00000173039" "ENSG00000108443" "ENSG00000175634" "ENSG00000159216" "ENSG00000079102" "ENSG00000115904"
+[49] "ENSG00000100485" "ENSG00000066336" "ENSG00000168610" "ENSG00000126561" "ENSG00000173757" "ENSG00000081059"
+[55] "ENSG00000152284" "ENSG00000148737" "ENSG00000109906" 
 ```
 
 
@@ -41,49 +65,67 @@ $KEGG_ABC_TRANSPORTERS
 
 &nbsp;
 
-### Preprocessing
-We follow DESeq2 workflow to normalize data, this is optional and users can use other packages/workflows. It should be noted that users could also use microarray data.
 
-```R
-dea_raw_count<- DESeqDataSetFromMatrix(countData = assay(sum_exp_raw_count), colData = colData(sum_exp_raw_count), design = ~ GROUP)
-# now we estimate the size factors
-dea_raw_count<- estimateSizeFactors(dea_raw_count)
-# Extract the normalized counts, this matrix must then go to the gsa
-sum_exp_normalized_counts<- counts(dea_raw_count, normalized=TRUE)
-sum_exp_normalized_counts<- log2(sum_exp_normalized_counts+0.5)
-# create new data frame with normalized counts.
-sum_exp_normalized_object <- SummarizedExperiment(assays=SimpleList(counts=sum_exp_normalized_counts), colData=colData(sum_exp_raw_count), rowData=DataFrame(rownames(sum_exp_normalized_counts)))
-```
-We have created a new SummarizedExperiment object with normalized counts instead of raw counts.
 
 ### GSA
 
-A standard GSA can be run to find gene sets enriched for differentially expressed genes between luminal A and luminal B subtypes of breast cancer. 
-```R
-w_o_mrema(sum_exp_normalized_object, gene_sets)
-```
-
-`mrema()` and `wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively. 
-
-The p-value is given for the likelihood-ratio test. This should be corrected for multiple testing and is conditional on the mid_dist being TRUE. mid_dist tests whether the weight assigned to the non-DE genes in a gene set is smaller in the gene set than in the genes outside the gene set.
-The size of the gene set is also given.
-
-Finally it is tested whether the Bayesian information criterion (BIC) of the gene is lower than the BIC for all.
-
-
-
-### csGSA (cell type specific GSA)
-
-Gene sets enriched differentially expressed genes in luminal B cancer cells when compared to luminal A cancer cells.
+Looking for significantly enriched gene sets between tumour and normal tissue samples.
 
 ```R
-cell_type_w_o_mrema(sum_exp_normalized_object, gene_sets)
+COAD_enrich <- GMM_1DF(COAD_SummarizedExperiment, gene_sets)
+head(COAD_enrich)
 ```
-`cell_type_mrema()` and `cell_type_wm_o_mrema()` can be used here for MREMA and WM-MREMA respectively.
+
+```R
+GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
+1 KEGG_ABC_TRANSPORTERS                                1     TRUE        43 FALSE              1
+2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.165 FALSE       57 FALSE              1
+3 KEGG_ADHERENS_JUNCTION                               0.241 FALSE       72 FALSE              1
+4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.878 TRUE        63 FALSE              1
+5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.271 FALSE       30 FALSE              1
+6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.263 FALSE       37 FALSE              1
+```
+
+The p-value and adjusted p-values are shown. The criteria for the middle component having a smaller weight in the inset than the outset is shown in the mid_dist column.
+
 &nbsp;
 
-Genes sets found to be enriched in normal cells in luminal B tumours when compared to normal cells in luminal A tumours can be found by changing the purity column values to (1 - purity) and running the cell-type specific functions.
+Looking for gene sets with a significantly different underlying LFC distribution between the inset and the outset.
 
+```R
+COAD_difference <- GMM_7DF(COAD_SummarizedExperiment, gene_sets)
+head(COAD_difference)
+```
+```R
+  GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
+1 KEGG_ABC_TRANSPORTERS                                0.214 TRUE        43 FALSE          0.924
+2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.826 TRUE        57 FALSE          1    
+3 KEGG_ADHERENS_JUNCTION                               0.151 TRUE        72 FALSE          0.787
+4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.940 TRUE        63 FALSE          1    
+5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.552 TRUE        30 FALSE          1    
+6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.937 TRUE        37 FALSE          1    
+```
 
+&nbsp;
 
+### More comparisons
 
+In order include covariates and interaction terms and to carry out more specific comparisons alter the DESeq2 design in the second block of code in the ```GMM_1DF()``` and ```GMM_7DF()``` functions. 
+
+&nbsp;
+Example - adding a covariate and interaction term for whether an individual in pre-menopausal or post-menopausal/male.
+```R
+### use Deseq2 to get group effect estimate and it's standard error
+dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(sum_exp_raw_count), design = ~ GROUP + menopause + GROUP:menopause)
+### this line sets pre-menopausal females as the reference group
+dea_raw_count$menopause <- relevel(dea_raw_count$menopause, ref = "pre")
+dds <- DESeq(dea_raw_count)
+### this gives the effect of cancer on pre-menopausal female samples
+res <- results(dds, name = "GROUP_1_vs_0")
+### uncomment this line for the effect of cancer on samples that are not pre-menopausal females
+#res <- results(dds, list(c("GROUP_1_vs_0", "GROUP1.menopausepost.none"))
+## uncomment this line for the difference in cancer effect between our two subsets of samples
+#res <- results(dds, name = "GROUP1.menopausepost.none")
+```
+
+There are more details on DESeq2 expirmental design [here](https://rstudio-pubs-static.s3.amazonaws.com/329027_593046fb6d7a427da6b2c538caf601e1.html)
