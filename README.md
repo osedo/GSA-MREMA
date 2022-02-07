@@ -14,7 +14,7 @@ source("GMM_7DF.R")
 load("COAD_SummarizedExperiment.RDs")
 ```
 
-A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. 
+A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. The data used in our analysis was downloaded from the [GDC portal](https://portal.gdc.cancer.gov/repository) with the GDC client. There is a useful tutorial on how to do this and create gene expression matrices [here](https://www.biostars.org/p/9500223/). The code used for the COAD-TCGA data is shown in ```tcga_data_wrangling.R```.   
 
 ```R
 COAD_SummarizedExperiment
