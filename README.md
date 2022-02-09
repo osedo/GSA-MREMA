@@ -5,32 +5,58 @@ A novel approach to GSA based on random effect meta-analysis, which compares the
 
 &nbsp;
 
-### Input 
+### Running MREMA
 
-Read in packages, functions and data
+Looking for significantly enriched gene sets between tumour and normal tissue samples.
 ```R
-source("packages.R")
-source("GMM_7DF.R")
-load("COAD_SummarizedExperiment.RDs")
-```
-
-A SummarizedExperiment object is required. Details on creating a SummarizedExperiment object can be found [here](https://www.bioconductor.org/help/course-materials/2019/BSS2019/04_Practical_CoreApproachesInBioconductor.html), in part 3. The data used in our analysis was downloaded from the [GDC portal](https://portal.gdc.cancer.gov/repository) with the GDC client. There is a useful tutorial on how to do this and create gene expression matrices [here](https://www.biostars.org/p/9500223/). The code used for creating the COAD_SummarizedExperiment object data is shown in ```tcga_data_wrangling.R```.   
-
-```R
-COAD_SummarizedExperiment
+# using the DF parameter to call 1DF test
+COAD_enrich <- mrema(postdata_COAD, gene_sets, DF = 1)
+head(COAD_enrich)
 ```
 ```R
-class: SummarizedExperiment 
-dim: 5230 501 
-metadata(0):
-assays(1): counts
-rownames(5230): ENSG00000000419 ENSG00000000938 ... ENSG00000280236 ENSG00000280314
-rowData names(0):
-colnames(501): TCGA-D5-6530-01A TCGA-G4-6320-01A ... TCGA-A6-5657-01A TCGA-AA-3688-01A
-colData names(5): GROUP Patient Age Sex menopause
+GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
+1 KEGG_ABC_TRANSPORTERS                                1     TRUE        43 FALSE              1
+2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.165 FALSE       57 FALSE              1
+3 KEGG_ADHERENS_JUNCTION                               0.241 FALSE       72 FALSE              1
+4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.878 TRUE        63 FALSE              1
+5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.271 FALSE       30 FALSE              1
+6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.263 FALSE       37 FALSE              1
+```
+The p-value and adjusted p-values are shown. The criteria for the middle component having a smaller weight in the inset than the outset is shown in the mid_dist column.
+
+&nbsp;
+
+Looking for gene sets with a significantly different underlying LFC distribution between the inset and the outset, this allows for a parameters in the mixture of each group of genes to be independent across gene groups. 
+
+```R
+COAD_difference <- mrema(postdata_COAD, gene_sets, DF = 7)
+head(COAD_difference)
+```
+```R
+  GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
+1 KEGG_ABC_TRANSPORTERS                                0.214 TRUE        43 FALSE          0.924
+2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.826 TRUE        57 FALSE          1    
+3 KEGG_ADHERENS_JUNCTION                               0.151 TRUE        72 FALSE          0.787
+4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.940 TRUE        63 FALSE          1    
+5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.552 TRUE        30 FALSE          1    
+6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.937 TRUE        37 FALSE          1    
 ```
 
-An R list of gene sets with each element corresponding to a gene set. 
+### Inputs
+ Require a list of gene sets and a dataframe with the gene names, logfold change estimate and standard error of the estimate in three columns. Any DE method can be used and effects combined with interation terms to make comparison between subsets.
+
+```R
+head(postdata_COAD)
+```
+```
+ genes           effect variance
+1 ENSG00000000419  0.0493   0.0143 
+2 ENSG00000000938 -0.00205  0.0360 
+3 ENSG00000000971 -0.422    0.0375 
+4 ENSG00000001036  0.0221   0.00459
+5 ENSG00000001084 -0.0713   0.00639
+6 ENSG00000001167 -0.137    0.00575
+```
 
 ```R
 gene_sets[c(1,2)]
@@ -61,71 +87,49 @@ $KEGG_ACUTE_MYELOID_LEUKEMIA
 ```
 
 
-
-
 &nbsp;
 
 
+### Running DE analysis 
 
-### GSA
-
-Looking for significantly enriched gene sets between tumour and normal tissue samples.
-
-```R
-COAD_enrich <- GMM_1DF(COAD_SummarizedExperiment, gene_sets)
-head(COAD_enrich)
-```
+The input for the mrema() function is a dataframe with gene names, the effect size being examined and the standard error of that effect size as columns. Here we use DESeq2 to estimate the effect of cancer on gene expression. Other tools can be used and other effects can be tested. 
 
 ```R
-GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
-1 KEGG_ABC_TRANSPORTERS                                1     TRUE        43 FALSE              1
-2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.165 FALSE       57 FALSE              1
-3 KEGG_ADHERENS_JUNCTION                               0.241 FALSE       72 FALSE              1
-4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.878 TRUE        63 FALSE              1
-5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.271 FALSE       30 FALSE              1
-6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.263 FALSE       37 FALSE              1
-```
+# filter out genes not in list of gene sets and lowly expressed genes
+igenes <- intersect(rownames(assay(COAD_SummarizedExperiment)), unique(unlist(gene_sets)))
+if(!length(igenes)) stop("Expression dataset (se)", " and ", "gene sets (gs) have no gene IDs in common")
+se <- assay(COAD_SummarizedExperiment)[igenes,]
+group <- colData(COAD_SummarizedExperiment)$GROUP
+keep <- filterByExpr(se, group = group)
+se <- se[keep,]
+gene_sets <- lapply(gene_sets, function(s) s[s %in% rownames(se)]) 
 
-The p-value and adjusted p-values are shown. The criteria for the middle component having a smaller weight in the inset than the outset is shown in the mid_dist column.
-
-&nbsp;
-
-Looking for gene sets with a significantly different underlying LFC distribution between the inset and the outset.
-
-```R
-COAD_difference <- GMM_7DF(COAD_SummarizedExperiment, gene_sets)
-head(COAD_difference)
-```
-```R
-  GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
-1 KEGG_ABC_TRANSPORTERS                                0.214 TRUE        43 FALSE          0.924
-2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.826 TRUE        57 FALSE          1    
-3 KEGG_ADHERENS_JUNCTION                               0.151 TRUE        72 FALSE          0.787
-4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.940 TRUE        63 FALSE          1    
-5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.552 TRUE        30 FALSE          1    
-6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.937 TRUE        37 FALSE          1    
-```
-
-&nbsp;
-
-### More comparisons
-
-In order include covariates and interaction terms and to carry out more specific comparisons alter the DESeq2 design in the second block of code in the ```GMM_1DF()``` and ```GMM_7DF()``` functions. 
-
-&nbsp;
-Example - adding a covariate and interaction term for whether an individual in pre-menopausal or post-menopausal/male.
-```R
 ### use Deseq2 to get group effect estimate and it's standard error
-dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(sum_exp_raw_count), design = ~ GROUP + menopause + GROUP:menopause)
+dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(COAD_SummarizedExperiment), design = ~ GROUP)
+dds <- DESeq(dea_raw_count)
+res <- results(dds)
+postdata <- tibble("genes" = rownames(res), "effect" = res[,2], "variance" = res[,3]^2)
+postdata_COAD <- postdata[complete.cases(postdata),]
+```
+&nbsp;
+
+Another potential effect size to test for differences in the underlying LFC distribution is the interaction term for cancer status and whether an individual is pre-menopausal. 
+
+```{r}
+### use Deseq2 to get group effect estimate and it's standard error
+dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(COAD_SummarizedExperiment), design = ~ GROUP + menopause + GROUP:menopause)
 ### this line sets pre-menopausal females as the reference group
 dea_raw_count$menopause <- relevel(dea_raw_count$menopause, ref = "pre")
 dds <- DESeq(dea_raw_count)
 ### this gives the effect of cancer on pre-menopausal female samples
-res <- results(dds, name = "GROUP_1_vs_0")
+#res <- results(dds, name = "GROUP_1_vs_0")
 ### uncomment this line for the effect of cancer on samples that are not pre-menopausal females
 #res <- results(dds, list(c("GROUP_1_vs_0", "GROUP1.menopausepost.none"))
 ## uncomment this line for the difference in cancer effect between our two subsets of samples
-#res <- results(dds, name = "GROUP1.menopausepost.none")
+res <- results(dds, name = "GROUP1.menopausepost.none")
+### use these column names
+postdata_interaction <- tibble("genes" = rownames(res), "interaction_effect" = res[,2], "interaction_variance" = res[,3]^2)
+postdata_interaction <- postdata_interaction[complete.cases(postdata_interaction),]
 ```
 
 There are more details on DESeq2 expirmental design [here](https://rstudio-pubs-static.s3.amazonaws.com/329027_593046fb6d7a427da6b2c538caf601e1.html)
