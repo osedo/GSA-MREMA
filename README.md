@@ -9,6 +9,8 @@ A novel approach to GSA based on random effect meta-analysis, which compares the
 
 Looking for significantly enriched gene sets between tumour and normal tissue samples.
 ```R
+source("packages.R")
+source("mrema.R")
 # using the DF parameter to call 1DF test
 COAD_enrich <- mrema(postdata_COAD, gene_sets, DF = 1)
 head(COAD_enrich)
