@@ -1,4 +1,4 @@
-## Mixture of Random-Effect Meta-Analysis Components
+## Mixture of Random-Effect Meta-Analysis
 &nbsp;
 
 A novel approach to GSA based on random effect meta-analysis, which compares the distribution of the effect of a sample group on genes in a gene set with the distribution found in genes outside the gene set.
