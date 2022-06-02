@@ -12,80 +12,82 @@ Looking for significantly enriched gene sets between tumour and normal tissue sa
 source("packages.R")
 source("mrema.R")
 # using the DF parameter to call 1DF test
-COAD_enrich <- mrema(postdata_COAD, gene_sets, DF = 1)
-head(COAD_enrich)
+womrema_1.5 <- mrema(postdata_overlap, kegg.gs.overalp, DF = 1, threshold = 1.5, CI_interval = FALSE)
+head(womrema_1.5)
 ```
 ```R
-GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
-1 KEGG_ABC_TRANSPORTERS                                1     TRUE        43 FALSE              1
-2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.165 FALSE       57 FALSE              1
-3 KEGG_ADHERENS_JUNCTION                               0.241 FALSE       72 FALSE              1
-4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.878 TRUE        63 FALSE              1
-5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.271 FALSE       30 FALSE              1
-6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.263 FALSE       37 FALSE              1
+  GeneSets                                          `p-values` mid_dist  size BIC_value `Adj-Pval`
+  <chr>                                                  <dbl> <lgl>    <dbl> <lgl>          <dbl>
+1 hsa00010_Glycolysis_/_Gluconeogenesis                 0.789  FALSE       53 FALSE         0.883 
+2 hsa00020_Citrate_cycle_(TCA_cycle)                    0.479  FALSE       29 FALSE         0.676 
+3 hsa00030_Pentose_phosphate_pathway                    0.882  FALSE       25 FALSE         0.931 
+4 hsa00040_Pentose_and_glucuronate_interconversions     0.0128 TRUE        23 FALSE         0.0471
+5 hsa00051_Fructose_and_mannose_metabolism              0.417  FALSE       32 FALSE         0.624 
+6 hsa00052_Galactose_metabolism                         0.251  TRUE        27 FALSE         0.433 
 ```
 The p-value and adjusted p-values are shown. The criteria for the middle component having a smaller weight in the inset than the outset is shown in the mid_dist column.
 
 &nbsp;
 
-Looking for gene sets with a significantly different underlying LFC distribution between the inset and the outset, this allows for a parameters in the mixture of each group of genes to be independent across gene groups. 
+Looking for gene sets with a significantly different underlying LFC distribution between the inset and the outset, this allows for a parameters in the mixture of each group of genes to be independent across gene groups.
 
 ```R
-COAD_difference <- mrema(postdata_COAD, gene_sets, DF = 7)
-head(COAD_difference)
+mrema_1.5 <- mrema(postdata_overlap, kegg.gs.overalp, DF = 6, threshold = 1.5, CI_interval = FALSE)
+head(mrema_1.5)
 ```
 ```R
-  GeneSets                                        `p-values` mid_dist  size BIC_value `Adj-Pval`
-1 KEGG_ABC_TRANSPORTERS                                0.214 TRUE        43 FALSE          0.924
-2 KEGG_ACUTE_MYELOID_LEUKEMIA                          0.826 TRUE        57 FALSE          1    
-3 KEGG_ADHERENS_JUNCTION                               0.151 TRUE        72 FALSE          0.787
-4 KEGG_ADIPOCYTOKINE_SIGNALING_PATHWAY                 0.940 TRUE        63 FALSE          1    
-5 KEGG_ALANINE_ASPARTATE_AND_GLUTAMATE_METABOLISM      0.552 TRUE        30 FALSE          1    
-6 KEGG_ALDOSTERONE_REGULATED_SODIUM_REABSORPTION       0.937 TRUE        37 FALSE          1    
+  GeneSets                                          `p-values` mid_dist  size BIC_value `Adj-Pval`
+1 hsa00010_Glycolysis_/_Gluconeogenesis              0.000297  TRUE        53 FALSE      0.000748 
+2 hsa00020_Citrate_cycle_(TCA_cycle)                 0.0465    TRUE        29 FALSE      0.0656   
+3 hsa00030_Pentose_phosphate_pathway                 0.0000299 TRUE        25 FALSE      0.0000960
+4 hsa00040_Pentose_and_glucuronate_interconversions  0.0000910 TRUE        23 FALSE      0.000271 
+5 hsa00051_Fructose_and_mannose_metabolism           0.0131    TRUE        32 FALSE      0.0217   
+6 hsa00052_Galactose_metabolism                      0.198     TRUE        27 FALSE      0.237  
 ```
 
 ### Inputs
  Require a list of gene sets and a dataframe with the gene names, logfold change estimate and standard error of the estimate in three columns. Any DE method can be used and effects combined with interation terms to make comparison between subsets.
 
 ```R
-head(postdata_COAD)
+head(postdata_overlap)
 ```
 ```
- genes           effect variance
-1 ENSG00000000419  0.0493   0.0143 
-2 ENSG00000000938 -0.00205  0.0360 
-3 ENSG00000000971 -0.422    0.0375 
-4 ENSG00000001036  0.0221   0.00459
-5 ENSG00000001084 -0.0713   0.00639
-6 ENSG00000001167 -0.137    0.00575
+  Ensembl          effect variance
+   <chr>             <dbl>    <dbl>
+ 1 ENSG00000000419  0.620   0.0151 
+ 2 ENSG00000000938  0.0837  0.0293 
+ 3 ENSG00000000971 -1.40    0.0255 
+ 4 ENSG00000001036  0.136   0.00663
+ 5 ENSG00000001084  0.0182  0.00636
+ 6 ENSG00000001167  0.486   0.00540
+ 7 ENSG00000001561 -0.617   0.0149 
+ 8 ENSG00000001617  0.986   0.0317 
+ 9 ENSG00000001626 -0.499   0.0687 
+10 ENSG00000001630  0.976   0.0328 
 ```
 
 ```R
-gene_sets[c(1,2)]
+kegg.gs.overalp[c(1,2)]
 ```
 
 ```R
-$KEGG_ABC_TRANSPORTERS
- [1] "ENSG00000165029" "ENSG00000154263" "ENSG00000144452" "ENSG00000179869" "ENSG00000107331" "ENSG00000167972"
- [7] "ENSG00000198691" "ENSG00000154265" "ENSG00000154262" "ENSG00000064687" "ENSG00000141338" "ENSG00000154258"
-[13] "ENSG00000085563" "ENSG00000135776" "ENSG00000073734" "ENSG00000005471" "ENSG00000004846" "ENSG00000115657"
-[19] "ENSG00000131269" "ENSG00000197150" "ENSG00000150967" "ENSG00000103222" "ENSG00000124574" "ENSG00000121270"
-[25] "ENSG00000140798" "ENSG00000023839" "ENSG00000108846" "ENSG00000125257" "ENSG00000114770" "ENSG00000091262"
-[31] "ENSG00000006071" "ENSG00000069431" "ENSG00000101986" "ENSG00000173208" "ENSG00000117528" "ENSG00000119688"
-[37] "ENSG00000160179" "ENSG00000118777" "ENSG00000172350" "ENSG00000138075" "ENSG00000143921" "ENSG00000001626"
-[43] "ENSG00000168394" "ENSG00000204267"
+$`hsa00010_Glycolysis_/_Gluconeogenesis`
+ [1] "ENSG00000006534" "ENSG00000067057" "ENSG00000067225" "ENSG00000072210" "ENSG00000074800" "ENSG00000079739"
+ [7] "ENSG00000091140" "ENSG00000100889" "ENSG00000102144" "ENSG00000105220" "ENSG00000106633" "ENSG00000107789"
+[13] "ENSG00000108515" "ENSG00000108602" "ENSG00000109107" "ENSG00000111275" "ENSG00000111640" "ENSG00000111669"
+[19] "ENSG00000111674" "ENSG00000111716" "ENSG00000117448" "ENSG00000124253" "ENSG00000131069" "ENSG00000131828"
+[25] "ENSG00000132746" "ENSG00000134333" "ENSG00000136872" "ENSG00000137124" "ENSG00000141349" "ENSG00000141959"
+[31] "ENSG00000143149" "ENSG00000143627" "ENSG00000143891" "ENSG00000149925" "ENSG00000150768" "ENSG00000152556"
+[37] "ENSG00000154930" "ENSG00000156510" "ENSG00000156515" "ENSG00000159322" "ENSG00000159399" "ENSG00000160883"
+[43] "ENSG00000164904" "ENSG00000165140" "ENSG00000168291" "ENSG00000169299" "ENSG00000171314" "ENSG00000172331"
+[49] "ENSG00000172955" "ENSG00000196616" "ENSG00000197894" "ENSG00000198099" "ENSG00000248144"
 
-$KEGG_ACUTE_MYELOID_LEUKEMIA
- [1] "ENSG00000142208" "ENSG00000105221" "ENSG00000117020" "ENSG00000078061" "ENSG00000002330" "ENSG00000157764"
- [7] "ENSG00000133101" "ENSG00000110092" "ENSG00000245848" "ENSG00000213341" "ENSG00000187840" "ENSG00000122025"
-[13] "ENSG00000177885" "ENSG00000174775" "ENSG00000104365" "ENSG00000269335" "ENSG00000173801" "ENSG00000157404"
-[19] "ENSG00000133703" "ENSG00000138795" "ENSG00000169032" "ENSG00000126934" "ENSG00000100030" "ENSG00000102882"
-[25] "ENSG00000198793" "ENSG00000136997" "ENSG00000109320" "ENSG00000213281" "ENSG00000121879" "ENSG00000051382"
-[31] "ENSG00000171608" "ENSG00000105851" "ENSG00000145675" "ENSG00000105647" "ENSG00000117461" "ENSG00000141506"
-[37] "ENSG00000137193" "ENSG00000102096" "ENSG00000140464" "ENSG00000112033" "ENSG00000132155" "ENSG00000131759"
-[43] "ENSG00000173039" "ENSG00000108443" "ENSG00000175634" "ENSG00000159216" "ENSG00000079102" "ENSG00000115904"
-[49] "ENSG00000100485" "ENSG00000066336" "ENSG00000168610" "ENSG00000126561" "ENSG00000173757" "ENSG00000081059"
-[55] "ENSG00000152284" "ENSG00000148737" "ENSG00000109906" 
+$`hsa00020_Citrate_cycle_(TCA_cycle)`
+ [1] "ENSG00000014641" "ENSG00000062485" "ENSG00000067829" "ENSG00000073578" "ENSG00000091140" "ENSG00000091483"
+ [7] "ENSG00000100412" "ENSG00000100889" "ENSG00000101365" "ENSG00000105953" "ENSG00000117118" "ENSG00000119689"
+[13] "ENSG00000122729" "ENSG00000124253" "ENSG00000131473" "ENSG00000131828" "ENSG00000136143" "ENSG00000138413"
+[19] "ENSG00000143252" "ENSG00000146701" "ENSG00000150768" "ENSG00000163541" "ENSG00000166411" "ENSG00000168291"
+[25] "ENSG00000172340" "ENSG00000173599" "ENSG00000182054" "ENSG00000197444" "ENSG00000204370"
 ```
 
 
@@ -97,41 +99,25 @@ $KEGG_ACUTE_MYELOID_LEUKEMIA
 The input for the mrema() function is a dataframe with gene names, the effect size being examined and the standard error of that effect size as columns. Here we use DESeq2 to estimate the effect of cancer on gene expression. Other tools can be used and other effects can be tested. 
 
 ```R
-# filter out genes not in list of gene sets and lowly expressed genes
-igenes <- intersect(rownames(assay(COAD_SummarizedExperiment)), unique(unlist(gene_sets)))
-if(!length(igenes)) stop("Expression dataset (se)", " and ", "gene sets (gs) have no gene IDs in common")
-se <- assay(COAD_SummarizedExperiment)[igenes,]
-group <- colData(COAD_SummarizedExperiment)$GROUP
+load("~/data/COAD__SummarizedExperiment.RData")
+kegg.gs <- getGenesets(org="hsa", db="kegg", gene.id.type = "ENSEMBL")
+
+## run DESeq2 with individual/block as covariate
+se <- assay(SummarizedExperiment)
+group <- colData(SummarizedExperiment)$GROUP
 keep <- filterByExpr(se, group = group)
 se <- se[keep,]
-gene_sets <- lapply(gene_sets, function(s) s[s %in% rownames(se)]) 
 
-### use Deseq2 to get group effect estimate and it's standard error
-dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(COAD_SummarizedExperiment), design = ~ GROUP)
+dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(SummarizedExperiment), design = ~ BLOCK + GROUP)
+dea_raw_count$GROUP <- relevel(as.factor(dea_raw_count$GROUP), ref = "Solid Tissue Normal")
 dds <- DESeq(dea_raw_count)
 res <- results(dds)
-postdata <- tibble("genes" = rownames(res), "effect" = res[,2], "variance" = res[,3]^2)
-postdata_COAD <- postdata[complete.cases(postdata),]
+res <- res[complete.cases(res),]
+postdata <- tibble("Ensembl" = substr(rownames(res),1,15), "effect" = res[,2], "variance" = res[,3]^2)
+postdata <- postdata[complete.cases(postdata),]
+
+postdata_overlap <- postdata[which(postdata$Ensembl %in% unlist(kegg.gs)),]
+kegg.gs.overalp <- lapply(kegg.gs, function(s) s[s %in% postdata_overlap$Ensembl]) 
 ```
 &nbsp;
 
-Another potential effect size to test for differences in the underlying LFC distribution is the interaction term for cancer status and whether an individual is pre-menopausal. 
-
-```{r}
-### use Deseq2 to get group effect estimate and it's standard error
-dea_raw_count<- DESeqDataSetFromMatrix(countData = se, colData = colData(COAD_SummarizedExperiment), design = ~ GROUP + menopause + GROUP:menopause)
-### this line sets pre-menopausal females as the reference group
-dea_raw_count$menopause <- relevel(dea_raw_count$menopause, ref = "pre")
-dds <- DESeq(dea_raw_count)
-### this gives the effect of cancer on pre-menopausal female samples
-#res <- results(dds, name = "GROUP_1_vs_0")
-### uncomment this line for the effect of cancer on samples that are not pre-menopausal females
-#res <- results(dds, list(c("GROUP_1_vs_0", "GROUP1.menopausepost.none"))
-## uncomment this line for the difference in cancer effect between our two subsets of samples
-res <- results(dds, name = "GROUP1.menopausepost.none")
-### use these column names
-postdata_interaction <- tibble("genes" = rownames(res), "interaction_effect" = res[,2], "interaction_variance" = res[,3]^2)
-postdata_interaction <- postdata_interaction[complete.cases(postdata_interaction),]
-```
-
-There are more details on DESeq2 expirmental design [here](https://rstudio-pubs-static.s3.amazonaws.com/329027_593046fb6d7a427da6b2c538caf601e1.html)
