@@ -36,20 +36,20 @@ postdata <- postdata[complete.cases(postdata),]
 
 # only keep genes which are in a kegg dataset
 postdata_overlap <- postdata[which(postdata$Ensembl %in% unlist(kegg.gs)),]
-kegg.gs.overalp <- lapply(kegg.gs, function(s) s[s %in% postdata_overlap$Ensembl])
+kegg.gs.overlap <- lapply(kegg.gs, function(s) s[s %in% postdata_overlap$Ensembl])
 
 # remove gene sets that are too small/large
 GS.MIN.SIZE <- 5
 GS.MAX.SIZE <- 500
 lens <- lengths(kegg.gs.overalp)
-kegg.gs.overalp <- kegg.gs.overalp[lens >= GS.MIN.SIZE & lens <= GS.MAX.SIZE]
+kegg.gs.overlap <- kegg.gs.overlap[lens >= GS.MIN.SIZE & lens <= GS.MAX.SIZE]
 ```
 
 ### Running MREMA
 
 Looking for significantly enriched gene sets between tumour and normal tissue samples.
 ```R
-mrema_1DF <- mrema(postdata = postdata_overlap, raw.gs = kegg.gs.overalp, DF = 1, threshold = 1.5)
+mrema_1DF <- mrema(postdata = postdata_overlap, raw.gs = kegg.gs.overlap, DF = 1, threshold = 1.5)
 DataFrame(mrema_1DF)
 ```
 ```R
