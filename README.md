@@ -41,13 +41,57 @@ kegg.gs.overlap <- lapply(kegg.gs, function(s) s[s %in% postdata_overlap$Ensembl
 # remove gene sets that are too small/large
 GS.MIN.SIZE <- 5
 GS.MAX.SIZE <- 500
-lens <- lengths(kegg.gs.overalp)
+lens <- lengths(kegg.gs.overlap)
 kegg.gs.overlap <- kegg.gs.overlap[lens >= GS.MIN.SIZE & lens <= GS.MAX.SIZE]
 ```
 
 ### Running MREMA
 
 Looking for significantly enriched gene sets between tumour and normal tissue samples.
+
+As the first input there is the dataframe ``` postdata_overlap ``` with the first column being gene names, the second column the LFC estimate and the third column the variance of the LFC estimate. 
+
+```R
+DataFrame(postdata_overlap)
+```
+```R
+DataFrame with 5401 rows and 3 columns
+         Ensembl     effect  variance
+     <character>  <numeric> <numeric>
+1              2  -2.813973 0.0623559
+2          53947  -1.086577 0.0796909
+3           8086   0.431819 0.0127647
+4          65985   0.608141 0.0141467
+5          51166   0.162179 0.0680566
+...          ...        ...       ...
+5397        7643  1.2021809 0.1573218
+5398        7644  0.2892590 0.0781725
+5399       81931  1.2179119 0.0954465
+5400       84133  0.0187835 0.0258423
+5401        7791 -1.1828887 0.0578679
+```
+The second input is a list of gene sets ``` kegg.gs.overlap ```.
+
+```R
+kegg.gs.overlap[1:2]
+```
+```
+Show in New Window
+$`hsa00010_Glycolysis_/_Gluconeogenesis`
+ [1] "10327"  "125"    "126"    "128"    "130589" "1737"   "1738"   "2023"   "2026"   "2027"   "217"    "218"    "219"   
+[14] "2203"   "221"    "222"    "223"    "224"    "226"    "230"    "2597"   "2821"   "3098"   "3099"   "3101"   "3939"  
+[27] "3945"   "441531" "501"    "5106"   "5160"   "5162"   "5211"   "5213"   "5214"   "5223"   "5224"   "5230"   "5232"  
+[40] "5236"   "55276"  "55902"  "669"    "7167"   "83440"  "84532"  "92579"  "9562"  
+
+$`hsa00020_Citrate_cycle_(TCA_cycle)`
+ [1] "1431" "1737" "1738" "1743" "2271" "3417" "3418" "3419" "3420" "3421" "4190" "4191" "47"   "48"   "4967" "50"   "5091"
+[18] "5106" "5160" "5162" "6389" "6390" "6391" "6392" "8801" "8802" "8803"
+```
+
+We can now run MREMA. Here we are looking for gene sets enriched for differentially expressed genes so we set the ``` DF ``` parameter to 1. Other options for the parameter are ``` DF = 2 ``` which tests for gene sets with significantly different proportion of upregulated and downregulated genes, and ``` DF = 6 ``` which tests for gene sets with significantly different LFC distributions. 
+
+The ``` threshold ``` parameter allows the researcher to define what they mean by differential expression by passing the absolute fold-change value. 
+
 ```R
 mrema_1DF <- mrema(postdata = postdata_overlap, raw.gs = kegg.gs.overlap, DF = 1, threshold = 1.5)
 DataFrame(mrema_1DF)
@@ -68,7 +112,7 @@ DataFrame with 337 rows and 6 columns
 336 hsa05417_Lipid_and_a..                 0         -0.000100034       172 9.93958e-01 1.00000e+00
 337 hsa05418_Fluid_shear..                 0         -0.007349065       120 8.70802e-01 9.34587e-01
 ```
-The p-value and adjusted p-values are shown. The criteria for a higher proportion of weight in the DE components in the gene set when compared to the background is shown in the Prop.DE.Increased column.
+The p-value and adjusted p-values are shown. The criteria for a higher proportion of weight in the DE components in the gene set when compared to the background is shown in the Prop.DE.Increased column. In order for a gene set to be consider enriched for DE genes, the p-value should be significant and the proportion of DE genes should increased in comparison to the background. 
 
 &nbsp;
 
